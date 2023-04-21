@@ -18,19 +18,19 @@
           <ion-label position="floating">
             Nombre
           </ion-label>
-          <ion-input formControlName="nombre"></ion-input>
+          <ion-input formControlName="usr"></ion-input>
         </ion-item>
     
         <ion-item>
           <ion-label position="floating">
             Contraseña
           </ion-label>
-          <ion-input formControlName="password" type="password"></ion-input>
+          <ion-input formControlName="pwd" type="password"></ion-input>
         </ion-item>    
     
       </form>
       <br>
-      <ion-button>
+      <ion-button (click)="logIn();">
         Ingresar
       </ion-button>
 
@@ -41,7 +41,7 @@
 
   
 </ion-content>
-
+<!--
 <ion-footer>
   <ion-toolbar color="primary">
     <ion-buttons slot="end">
@@ -50,3 +50,4 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-footer>
+-->
