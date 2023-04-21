@@ -1,28 +1,58 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { IonicModule, RefresherCustomEvent } from '@ionic/angular';
-import { MessageComponent } from '../message/message.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import{ FormGroup, FormControl, Validators, FormBuilder }from '@angular/forms';
+import { Usuario } from '../interface/usuario';
+import { UsuarioService } from '../service/usuario.service';
 
-import { DataService, Message } from '../services/data.service';
+
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, MessageComponent],
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class HomePage {
-  private data = inject(DataService);
-  constructor() {}
+  formUsuario: FormGroup;
+  isModalOpen = false;
+  public gerentes: Usuario[] = [];
+  public fGerentes: Usuario[] = [];
 
-  refresh(ev: any) {
-    setTimeout(() => {
-      (ev as RefresherCustomEvent).detail.complete();
-    }, 3000);
+  constructor(
+    private usrService: UsuarioService,
+    public fb: FormBuilder,
+  ) {
+    this.gerentes = usrService.getGerentes();
+    this.fGerentes = this.gerentes;
+    //this.formularioLogin=this.fb.group({
+    this.formUsuario = this.fb.group({});
   }
 
-  getMessages(): Message[] {
-    return this.data.getMessages();
+  public newUsuario() {
+    alert('Entre');
+    const hotel = this.formUsuario.controls['hotel'].value;
+    const celular = this.formUsuario.controls['celular'].value;
+
+    const defaultUsr = (hotel.replace(/\s/g, "")+'_'+celular.substring(5,9)); 
+    this.usrService.newUsuario({
+      IdUsuarioOK: defaultUsr,
+      IdUsuarioBK: defaultUsr,
+      Nombres: this.formUsuario.controls['usr'].value,
+      Apellidos: this.formUsuario.controls['usr'].value,
+      Hotel: hotel,
+      Rol: '2',
+      Clave: '',
+      CorreoEle: defaultUsr,
+      Celular: celular
+    });
   }
+
+  setOpen(isOpen: boolean) {
+    this.isModalOpen = isOpen;
+  }
+
+
 }

@@ -2,13 +2,8 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: 'home',
+    path: 'homeDirector',
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
-  },
-  {
-    path: 'message/:id',
-    loadComponent: () =>
-      import('./view-message/view-message.page').then((m) => m.ViewMessagePage),
   },
   {
     path: '',
@@ -18,6 +13,10 @@ export const routes: Routes = [
   {
     path: 'login-admin',
     loadComponent: () => import('./login-admin/login-admin.page').then( m => m.LoginAdminPage)
+  },  {
+    path: 'home-gerente',
+    loadComponent: () => import('./home-gerente/home-gerente.page').then( m => m.HomeGerentePage)
   },
+
 ];
 
