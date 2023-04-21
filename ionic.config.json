@@ -1,0 +1,7 @@
+{
+  "name": "NOM035",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
