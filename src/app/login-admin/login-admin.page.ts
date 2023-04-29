@@ -47,10 +47,10 @@ export class LoginAdminPage implements OnInit {
    if(logedIn?.Clave != pwd) this.presentToast('Contraseña o usuario incorrecto', 'warning');
    else if (logedIn?.Clave == pwd && logedIn?.Rol == '1') {
     this.presentToast('Bienvenido Director', 'success'); 
-    this.router.navigate(['/homeDirector']);
+    this.router.navigate(['/homeDirector',usr]);
    }else if (logedIn?.Clave == pwd && logedIn?.Rol == '2') {
     this.presentToast('Bienvenido Gerente', 'success'); 
-    this.router.navigate(['/home-gerente']);
+    this.router.navigate(['/home-gerente',usr]);
    }
   }
 

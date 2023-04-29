@@ -8,4 +8,6 @@ export interface Usuario {
     Clave: string;
     CorreoEle: string;
     Celular: string;
+    Generated: boolean;
+    Activo: boolean;
 }
