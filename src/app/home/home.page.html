@@ -1,17 +1,17 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Usuarios {{isModalUpdate}}
+      Hola {{(admin?.Nombres)+''}}
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" *ngIf="enabled">
   <ion-grid>
 
     <ion-row>
       <ion-col size="10">
-        <ion-searchbar placeholder="Buscar por nombre">
+        <ion-searchbar placeholder="Buscar por nombre" (ionChange)="filterGerentes($event)" #ionBusqueda>
         </ion-searchbar>
       </ion-col>
       <ion-col size="2">
@@ -40,7 +40,7 @@
   <ion-row>
       <ion-col size="12">
         <ion-list>
-          <ion-item-sliding *ngFor="let g of gerentes; let i=index">
+          <ion-item-sliding *ngFor="let g of fGerentes; let i=index">
             <ion-item>
               <div class="contenedor-gerentes">
                 <ion-chip [color]="getIconActivo(g.Activo).iconColor" outline="true">
@@ -57,10 +57,10 @@
             <ion-item-options 
               side="start"
               expandable>
-              <ion-item-option *ngIf="!g.Activo" color="success" (click)="updateUsrActivo(i,true)">
+              <ion-item-option *ngIf="!g.Activo" color="success" (click)="updateUsrActivo(g,true)">
                 <ion-icon name="checkmark"></ion-icon>
               </ion-item-option>
-              <ion-item-option *ngIf="g.Activo" color="danger" (click)="updateUsrActivo(i,false)">
+              <ion-item-option *ngIf="g.Activo" color="danger" (click)="updateUsrActivo(g,false)">
                 <ion-icon name="close"></ion-icon>
               </ion-item-option>
             </ion-item-options>
@@ -68,12 +68,14 @@
             <ion-item-options
               side="end"
               expandable>
-             <!-- <ion-item-option color="danger">
+             <ion-item-option 
+                color="danger"
+                (click)="deleteUser(g)">
                 <ion-icon name="trash"></ion-icon>
-              </ion-item-option>-->
+              </ion-item-option>
               <ion-item-option 
                 color="primary"
-                (click)="setUpdateOpen(g,i)">
+                (click)="setUpdateOpen(g)">
                 <ion-icon name="create"></ion-icon>
               </ion-item-option>
             </ion-item-options>
@@ -85,14 +87,14 @@
 
   </ion-grid>
 
-  <ion-modal [isOpen]="isModalOpen">
+  <ion-modal [isOpen]="isModalOpen" [backdropDismiss]="false">
     <ng-template>
       <ion-header>
         <ion-toolbar>
           <ion-title *ngIf="!isModalUpdate">Agregar Usuario</ion-title>
           <ion-title *ngIf="isModalUpdate">Modificar {{gerentes[usrToUpdate].IdUsuarioBK}}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="setOpen(false)">Close</ion-button>
+            <ion-button (click)="setClose()">Close</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>

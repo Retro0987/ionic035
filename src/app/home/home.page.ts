@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { IonicModule, RefresherCustomEvent } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import{ FormGroup, FormControl, Validators, FormBuilder }from '@angular/forms';
+import { Router, ActivatedRoute, Routes } from '@angular/router';
 
 import { IconColor } from '../interface/icon-color';
 import { Usuario } from '../interface/usuario';
 import { UsuarioService } from '../service/usuario.service';
 
 import {AlertController,IonSearchbar,IonSelect,ModalController,ToastController } from '@ionic/angular';
+
 
 
 
@@ -20,14 +22,17 @@ import {AlertController,IonSearchbar,IonSelect,ModalController,ToastController }
   imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class HomePage {
-
+  @ViewChild('ionBusqueda') busqueda!: IonSearchbar;
+  
+  enabled: boolean=false;
+  admin?: Usuario;
   usrToUpdate: number = 0; //Toma el valor del indice cuando isModalUpdate es verdadero
   validationMessages;
   formUsuario: FormGroup;
   isModalOpen = false;
   isModalUpdate = false;
   public gerentes: Usuario[] = [];
-  //public fGerentes: Usuario[] = [];
+  public fGerentes: Usuario[] = [];
 
   constructor(
     private usrService: UsuarioService,
@@ -35,8 +40,11 @@ export class HomePage {
     private alertController: AlertController,
     private toastController: ToastController,
     private modalController: ModalController,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {
     this.gerentes = this.usrService.getGerentes();
+    this.fGerentes = this.gerentes;
 
     //HILG: En esta parte definimos los campos de nuestro formulario
     this.formUsuario = this.fb.group({
@@ -86,6 +94,22 @@ export class HomePage {
     }
   }
 
+  public filter (dato: String) {
+    if (!dato.trim()) {
+      this.fGerentes = this.gerentes;
+      return;
+    }
+    this.fGerentes = this.gerentes.filter((ger) =>
+      ger.Nombres.toLowerCase().includes(dato.toLowerCase())
+    );
+  }
+
+  public filterGerentes(event: Event) {
+    if (event instanceof CustomEvent) {
+      this.filter(event.detail.value);
+    }
+  }
+
   //HILG: createUser nos da una contraseña e Id's por default el cual es el hotel mas los ultimos cuatro digitos
     // del celular
 
@@ -105,6 +129,10 @@ export class HomePage {
     return userToAdd;
   }//HILG
 
+  private findUsrIndex(usr: Usuario): number {
+    return this.gerentes.findIndex( u => u.IdUsuarioOK == usr.IdUsuarioOK );
+  }
+
   public addUser() {
     const newUser = this.createUser();
     this.usrService.addUsuario(newUser);
@@ -113,17 +141,26 @@ export class HomePage {
     this.setOpen(false);
   }
 
-  public updateUsrActivo(i: number, activo: boolean) {
-    
+  public deleteUser(usr: Usuario) {
+    this.confirmationDialog('Estas seguro de borrar el Usuario: '+usr.IdUsuarioBK+
+    ' perteneciente al hotel: '+usr.Hotel,
+      () => {
+        this.gerentes.splice(this.findUsrIndex(usr),1);
+        this.usrService.deleteUsr(usr);
+    });
+  }
+
+  public updateUsrActivo(usr: Usuario, activo: boolean) {
+    const i = this.findUsrIndex(usr);
     this.gerentes[i].Activo = activo;
-    this.usrService.updateUsrActivo(i,activo);
+    this.usrService.updateUsrActivo(usr,activo);
     
     this.presentToast('Estatus modificado exitosamente', 'success');
   }
 
   public updateUsr() {
     const updatedUsr = this.formUsuario.getRawValue()
-    this.usrService.updateUsuario(updatedUsr,this.usrToUpdate);
+    this.usrService.updateUsuario(updatedUsr);
     this.gerentes[this.usrToUpdate] = updatedUsr;
     this.setOpen(false);
     this.presentToast('Usuario modificado exitosamente', 'success');
@@ -136,13 +173,19 @@ export class HomePage {
     }
   }
 
+  setClose() {
+    this.setOpen(false);
+    this.presentToast('Operación cancelada','danger');
+  }
+
   setCloseUpdateModal(){
     this.usrToUpdate = 0;
     this.isModalUpdate = false;
     this.formUsuario.reset();
   }
 
-  setUpdateOpen(usr: Usuario, i: number) {
+  setUpdateOpen(usr: Usuario) {
+    const i = this.findUsrIndex(usr);
     this.isModalUpdate = true;
     this.usrToUpdate = i;
     this.formUsuario.patchValue(usr);
@@ -200,6 +243,15 @@ export class HomePage {
       color,
     });
     toast.present();
+  }
+
+  ionViewDidEnter() {
+    this.activatedRoute.paramMap.subscribe((params) => {
+      if (params.get('id')) {
+       this.admin = this.usrService.findUsrByIdBK(params.get('id')+'');
+       if(this.admin?.Rol=='1') this.enabled = true;
+      }else this.enabled = false;
+    });
   }
 
 

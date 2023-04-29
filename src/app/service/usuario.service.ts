@@ -1,22 +1,28 @@
-import { Injectable } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Injectable,Component } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Usuario } from '../interface/usuario';
 
+import base from './api';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsuarioService {
+  
+  url = base+/Usuario/;
 
   private usuarios: Usuario[] = [];
 
   constructor() {
     this.usuarios.push({
       IdUsuarioOK: "sanjose_5678",
-      IdUsuarioBK: "sanjose_5678",
+      IdUsuarioBK: "jaime",
       Nombres: "Jaime",
       Apellidos: "Robles",
       Hotel: "San Jose",
-      Rol: "1",
+      Rol: "2",
       Clave: "123",
       CorreoEle: "jaimito@ittepic.edu.mx",
       Celular: "3112345678",
@@ -24,12 +30,12 @@ export class UsuarioService {
       Activo: true
     },{
       IdUsuarioOK: "lahiguera_5678",
-      IdUsuarioBK: "lahiguera_5678",
+      IdUsuarioBK: "llanos",
       Nombres: "Hector",
       Apellidos: "Llanos",
-      Clave: "456",
+      Clave: "123",
       Hotel: "La Higuera",
-      Rol: "2",
+      Rol: "1",
       CorreoEle: "Hector@ittepic.edu.mx",
       Celular: "3112345678",
       Generated: false,
@@ -50,7 +56,8 @@ export class UsuarioService {
 
     
   }
-  
+
+
   public getUsuarios(): Usuario[] {
     return this.usuarios;
   }
@@ -59,13 +66,28 @@ export class UsuarioService {
     this.usuarios.push(usr);
   }
   
-  public updateUsuario(usr: Usuario, i: number) {
-    this.usuarios[i] = usr;
+  public updateUsuario(usr: Usuario) {
+    this.usuarios[this.findUsrIndex(usr)] = usr;
   }
 
-  public updateUsrActivo(i: number, valor: boolean) {
-    
-    this.usuarios[i].Activo = valor;
+  public deleteUsr(usr: Usuario) {
+    this.usuarios.splice(this.findUsrIndex(usr),1);
+  }
+
+  public updateUsrActivo(usr: Usuario, valor: boolean) {
+    this.usuarios[this.findUsrIndex(usr)].Activo = valor;
+  }
+
+  private findUsrIndex(usr: Usuario): number {
+    return this.usuarios.findIndex( u => u.IdUsuarioOK == usr.IdUsuarioOK );
+  }
+
+  public findUsrByIdBK(IdUsuarioOK: string): Usuario|undefined {
+    return this.usuarios.find( usr => usr.IdUsuarioBK == IdUsuarioOK);
+  }
+
+  public findUsrByIndexBK(IdUsuarioOK: string): Usuario {
+    return this.usuarios[this.usuarios.findIndex( u => u.IdUsuarioOK == IdUsuarioOK )];
   }
 
   public getGerentes(): Usuario[] {
